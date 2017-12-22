@@ -44,19 +44,22 @@ typedef void(*IntFnPtrTy)(Closure c, int i);
 Closure g_ret_stack[STACK_SIZE];
 int g_ret_sp = 0;
 
-void pushReturn(Closure c) {
+__attribute__((always_inline))
+inline void pushReturn(Closure c) {
 	// assert(g_ret_sp <= STACK_SIZE - 1);
 	g_ret_stack[g_ret_sp++] = c;
 }
 
 
-Closure popReturn() {
+__attribute__((always_inline))
+inline Closure popReturn() {
 	Closure c = g_ret_stack[--g_ret_sp];
 	// assert(g_ret_sp >= 0);
 	return c;
 }
 
-Closure mkclosure0(void *f) {
+__attribute__((always_inline))
+inline Closure mkclosure0(void *f) {
 	Closure c;
 	c.fn = (void *)f;
 	c.data1 = c.data2 = 52;
@@ -64,7 +67,8 @@ Closure mkclosure0(void *f) {
 }
 
 
-Closure mkclosure1(void *f, int i) {
+__attribute__((always_inline))
+inline Closure mkclosure1(void *f, int i) {
 	Closure c;
 	c.fn = f;
 	c.data1 = i;
@@ -78,7 +82,7 @@ void main_return(Closure c, int i) {
 
 
 /* forward decl */
-void ackerman(int i, int j);
+inline void ackerman(int i, int j);
 
 
 void case_ackerman_aval_bdec(Closure c, int bnew) {
@@ -94,7 +98,7 @@ void ackerman(const int a, const int b) {
 		ackerman(a - 1, 1);
     }
 	else {
-		pushReturn(mkclosure1(case_ackerman_aval_bdec, a - 1));
+		pushReturn(mkclosure1((void *)case_ackerman_aval_bdec, a - 1));
 		ackerman(a, b - 1);
 	}
 
