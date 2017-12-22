@@ -4,6 +4,9 @@ Investigating code generation in GHC.
 In GHC, we tend to manage our own call stack as a "return stack".
 Benchmarking this versus having an actual stack.
 
+In the PNGs, the first is *always* the C version (optimal) and the second
+is haskell-like-C.
+
 - https://gist.github.com/bollu/66a445df8e419735b1dab044b5fd0553
 
 # Sources
@@ -347,3 +350,4 @@ g_ret_sp:
 	.section	".note.GNU-stack","",@progbits
 
 ```
+
