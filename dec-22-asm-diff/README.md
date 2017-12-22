@@ -32,51 +32,48 @@ int main() {
 # Perf
 ### C performance on `-O1`
 ```
-╭─bollu@cantordust ~/work/sxhc/haskell-microbenchmarks/ackerman/c  ‹master*› 
-╰─$ sudo perf stat -d ./a.out                   
-[sudo] password for bollu: 
+╭─bollu@cantordust ~/exploration/dec-22-asm-diff/c  ‹master*› 
+╰─$ sudo perf stat -d ./a.out
 16381
  Performance counter stats for './a.out':
 
-        216.792392      task-clock (msec)         #    0.998 CPUs utilized          
-                 1      context-switches          #    0.005 K/sec                  
+        195.843427      task-clock (msec)         #    0.998 CPUs utilized          
+                 0      context-switches          #    0.000 K/sec                  
                  0      cpu-migrations            #    0.000 K/sec                  
-               110      page-faults               #    0.507 K/sec                  
-      64,76,73,623      cycles                    #    2.988 GHz                      (48.41%)
-    1,78,49,43,817      instructions              #    2.76  insn per cycle           (61.32%)
-      61,55,63,749      branches                  # 2839.416 M/sec                    (61.27%)
-          4,01,246      branch-misses             #    0.07% of all branches          (62.82%)
-      17,89,24,775      L1-dcache-loads           #  825.328 M/sec                    (60.61%)
-       3,29,16,161      L1-dcache-load-misses     #   18.40% of all L1-dcache hits    (26.02%)
-            63,958      LLC-loads                 #    0.295 M/sec                    (24.75%)
-             5,780      LLC-load-misses           #    9.04% of all LL-cache hits     (35.81%)
+               111      page-faults               #    0.567 K/sec                  
+      63,98,03,886      cycles                    #    3.267 GHz                      (50.80%)
+    1,78,86,31,500      instructions              #    2.80  insn per cycle           (63.24%)
+      62,08,15,851      branches                  # 3169.960 M/sec                    (63.24%)
+          2,89,099      branch-misses             #    0.05% of all branches          (63.23%)
+      18,30,28,830      L1-dcache-loads           #  934.567 M/sec                    (57.56%)
+       3,24,91,238      L1-dcache-load-misses     #   17.75% of all L1-dcache hits    (24.60%)
+          1,16,904      LLC-loads                 #    0.597 M/sec                    (25.65%)
+               210      LLC-load-misses           #    0.18% of all LL-cache hits     (37.67%)
 
-       0.217306155 seconds time elapsed
+       0.196242193 seconds time elapsed
+
 ```
 
 ### Haskell like C performance on `-O1`
 
 ```
-╭─bollu@cantordust ~/exploration/dec-22-asm-diff/haskell-like-c  ‹master*› 
-╰─$ sudo perf  stat -d ./a.out                                                                                                                                   255 ↵
-[sudo] password for bollu: 
 16381
  Performance counter stats for './a.out':
 
-        368.344137      task-clock (msec)         #    0.998 CPUs utilized          
-                 0      context-switches          #    0.000 K/sec                  
+        365.511549      task-clock (msec)         #    0.999 CPUs utilized          
+                 2      context-switches          #    0.005 K/sec                  
                  0      cpu-migrations            #    0.000 K/sec                  
-               112      page-faults               #    0.304 K/sec                  
-    1,17,08,87,766      cycles                    #    3.179 GHz                      (50.43%)
-    2,01,29,81,158      instructions              #    1.72  insn per cycle           (63.24%)
-      35,10,07,332      branches                  #  952.933 M/sec                    (63.64%)
-            42,870      branch-misses             #    0.01% of all branches          (64.04%)
-      36,08,12,951      L1-dcache-loads           #  979.554 M/sec                    (61.20%)
-       3,22,51,684      L1-dcache-load-misses     #    8.94% of all L1-dcache hits    (24.31%)
-            63,103      LLC-loads                 #    0.171 M/sec                    (23.97%)
-               346      LLC-load-misses           #    0.55% of all LL-cache hits     (37.60%)
+               113      page-faults               #    0.309 K/sec                  
+    1,17,82,84,369      cycles                    #    3.224 GHz                      (50.43%)
+    2,10,87,92,898      instructions              #    1.79  insn per cycle           (63.24%)
+      44,02,18,960      branches                  # 1204.391 M/sec                    (63.64%)
+            47,825      branch-misses             #    0.01% of all branches          (63.89%)
+      36,43,17,693      L1-dcache-loads           #  996.734 M/sec                    (60.85%)
+       3,16,54,607      L1-dcache-load-misses     #    8.69% of all L1-dcache hits    (24.24%)
+            60,686      LLC-loads                 #    0.166 M/sec                    (25.35%)
+               104      LLC-load-misses           #    0.17% of all LL-cache hits     (37.60%)
 
-       0.369129171 seconds time elapsed
+       0.365935114 seconds time elapsed
 ```
 # Asm
 
@@ -199,38 +196,37 @@ ackerman:                               # @ackerman
 # %bb.0:
 	movl	%esi, %eax
 	testl	%edi, %edi
-	je	.LBB2_4
-# %bb.1:
-	movl	%edi, %ecx
+	jne	.LBB2_2
+	jmp	.LBB2_4
 	.p2align	4, 0x90
+.LBB2_3:                                #   in Loop: Header=BB2_2 Depth=1
+	movl	$1, %eax
+	testl	%edi, %edi
+	je	.LBB2_4
 .LBB2_2:                                # =>This Loop Header: Depth=1
                                         #     Child Loop BB2_5 Depth 2
-	leal	-1(%rcx), %edx
+	addl	$-1, %edi
 	testl	%eax, %eax
 	je	.LBB2_3
 	.p2align	4, 0x90
 .LBB2_5:                                #   Parent Loop BB2_2 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
-	movslq	g_ret_sp(%rip), %rsi
-	leal	1(%rsi), %edi
-	movl	%edi, g_ret_sp(%rip)
-	shlq	$4, %rsi
-	movq	$case_ackerman_aval_bdec, g_ret_stack(%rsi)
-	movq	%rdx, g_ret_stack+8(%rsi)
+	movslq	g_ret_sp(%rip), %rcx
+	leal	1(%rcx), %edx
+	movl	%edx, g_ret_sp(%rip)
+	shlq	$4, %rcx
+	movq	$case_ackerman_aval_bdec, g_ret_stack(%rcx)
+	movl	%edi, g_ret_stack+8(%rcx)
 	addl	$-1, %eax
 	jne	.LBB2_5
-.LBB2_3:                                #   in Loop: Header=BB2_2 Depth=1
-	addq	$-1, %rcx
-	movl	$1, %eax
-	testl	%edx, %edx
-	jne	.LBB2_2
+	jmp	.LBB2_3
 .LBB2_4:
 	movslq	g_ret_sp(%rip), %rcx
 	addq	$-1, %rcx
 	movl	%ecx, g_ret_sp(%rip)
 	shlq	$4, %rcx
 	movq	g_ret_stack(%rcx), %rdi
-	movq	g_ret_stack+8(%rcx), %rsi
+	movl	g_ret_stack+8(%rcx), %esi
 	addl	$1, %eax
 	movl	%eax, %edx
 	jmpq	*%rdi                   # TAILCALL
@@ -251,8 +247,6 @@ main:                                   # @main
 	movl	%ecx, g_ret_sp(%rip)
 	shlq	$4, %rax
 	movq	$main_return, g_ret_stack(%rax)
-	movabsq	$223338299444, %rcx     # imm = 0x3400000034
-	movq	%rcx, g_ret_stack+8(%rax)
 	movl	$3, %edi
 	movl	$11, %esi
 	callq	ackerman
