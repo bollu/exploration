@@ -1,7 +1,7 @@
 all: clean build run
 build:
 	clang test.c -o a.out -O1
-	clang test.c -o a.s -O1  -S -mllvm --x86-asm-syntax=intel
+	clang test.c -o a.s -O1  -S
 	clang test.c -S -emit-llvm -o test.ll -O1
 
 clean:

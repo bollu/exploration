@@ -80,7 +80,6 @@ int main() {
 ### C
 ```asm
 	.text
-	.intel_syntax noprefix
 	.file	"test.c"
 	.globl	ackerman                # -- Begin function ackerman
 	.p2align	4, 0x90
@@ -88,37 +87,37 @@ int main() {
 ackerman:                               # @ackerman
 	.cfi_startproc
 # %bb.0:
-	push	rbx
+	pushq	%rbx
 	.cfi_def_cfa_offset 16
-	.cfi_offset rbx, -16
+	.cfi_offset %rbx, -16
                                         # kill: def %edi killed %edi def %rdi
-	test	edi, edi
+	testl	%edi, %edi
 	je	.LBB0_1
 	.p2align	4, 0x90
 .LBB0_3:                                # =>This Inner Loop Header: Depth=1
-	lea	ebx, [rdi - 1]
-	test	edi, edi
+	leal	-1(%rdi), %ebx
+	testl	%edi, %edi
 	jle	.LBB0_6
 # %bb.4:                                #   in Loop: Header=BB0_3 Depth=1
-	mov	eax, 1
-	test	esi, esi
+	movl	$1, %eax
+	testl	%esi, %esi
 	je	.LBB0_5
 .LBB0_6:                                #   in Loop: Header=BB0_3 Depth=1
-	add	esi, -1
+	addl	$-1, %esi
                                         # kill: def %edi killed %edi killed %rdi
-	call	ackerman
+	callq	ackerman
 .LBB0_5:                                #   in Loop: Header=BB0_3 Depth=1
-	mov	esi, eax
-	mov	edi, ebx
-	test	ebx, ebx
+	movl	%eax, %esi
+	movl	%ebx, %edi
+	testl	%ebx, %ebx
 	jne	.LBB0_3
 	jmp	.LBB0_2
 .LBB0_1:
-	mov	eax, esi
+	movl	%esi, %eax
 .LBB0_2:
-	add	eax, 1
-	pop	rbx
-	ret
+	addl	$1, %eax
+	popq	%rbx
+	retq
 .Lfunc_end0:
 	.size	ackerman, .Lfunc_end0-ackerman
 	.cfi_endproc
@@ -129,19 +128,19 @@ ackerman:                               # @ackerman
 main:                                   # @main
 	.cfi_startproc
 # %bb.0:
-	push	rax
+	pushq	%rax
 	.cfi_def_cfa_offset 16
-	mov	edi, 3
-	mov	esi, 11
-	call	ackerman
-	mov	ecx, eax
-	mov	edi, offset .L.str
-	xor	eax, eax
-	mov	esi, ecx
-	call	printf
-	xor	eax, eax
-	pop	rcx
-	ret
+	movl	$3, %edi
+	movl	$11, %esi
+	callq	ackerman
+	movl	%eax, %ecx
+	movl	$.L.str, %edi
+	xorl	%eax, %eax
+	movl	%ecx, %esi
+	callq	printf
+	xorl	%eax, %eax
+	popq	%rcx
+	retq
 .Lfunc_end1:
 	.size	main, .Lfunc_end1-main
 	.cfi_endproc
@@ -155,12 +154,12 @@ main:                                   # @main
 
 	.ident	"clang version 6.0.0 (https://github.com/llvm-mirror/clang.git 40e9a74cba88c271af3407dad30006386881097b) (https://github.com/llvm-mirror/llvm.git 981877461a4a4387994841065d35f4897fe8dfeb)"
 	.section	".note.GNU-stack","",@progbits
+
 ```
 
 ### Haskell like C
 ```asm
 	.text
-	.intel_syntax noprefix
 	.file	"test.c"
 	.globl	pushReturn              # -- Begin function pushReturn
 	.p2align	4, 0x90
@@ -168,13 +167,13 @@ main:                                   # @main
 pushReturn:                             # @pushReturn
 	.cfi_startproc
 # %bb.0:
-	movsxd	rax, dword ptr [rip + g_ret_sp]
-	lea	ecx, [rax + 1]
-	mov	dword ptr [rip + g_ret_sp], ecx
-	shl	rax, 4
-	mov	qword ptr [rax + g_ret_stack], rdi
-	mov	qword ptr [rax + g_ret_stack+8], rsi
-	ret
+	movslq	g_ret_sp(%rip), %rax
+	leal	1(%rax), %ecx
+	movl	%ecx, g_ret_sp(%rip)
+	shlq	$4, %rax
+	movq	%rdi, g_ret_stack(%rax)
+	movq	%rsi, g_ret_stack+8(%rax)
+	retq
 .Lfunc_end0:
 	.size	pushReturn, .Lfunc_end0-pushReturn
 	.cfi_endproc
@@ -185,13 +184,13 @@ pushReturn:                             # @pushReturn
 popReturn:                              # @popReturn
 	.cfi_startproc
 # %bb.0:
-	movsxd	rcx, dword ptr [rip + g_ret_sp]
-	add	rcx, -1
-	mov	dword ptr [rip + g_ret_sp], ecx
-	shl	rcx, 4
-	mov	rax, qword ptr [rcx + g_ret_stack]
-	mov	rdx, qword ptr [rcx + g_ret_stack+8]
-	ret
+	movslq	g_ret_sp(%rip), %rcx
+	addq	$-1, %rcx
+	movl	%ecx, g_ret_sp(%rip)
+	shlq	$4, %rcx
+	movq	g_ret_stack(%rcx), %rax
+	movq	g_ret_stack+8(%rcx), %rdx
+	retq
 .Lfunc_end1:
 	.size	popReturn, .Lfunc_end1-popReturn
 	.cfi_endproc
@@ -202,9 +201,9 @@ popReturn:                              # @popReturn
 mkclosure0:                             # @mkclosure0
 	.cfi_startproc
 # %bb.0:
-	movabs	rdx, 223338299444
-	mov	rax, rdi
-	ret
+	movabsq	$223338299444, %rdx     # imm = 0x3400000034
+	movq	%rdi, %rax
+	retq
 .Lfunc_end2:
 	.size	mkclosure0, .Lfunc_end2-mkclosure0
 	.cfi_endproc
@@ -215,9 +214,9 @@ mkclosure0:                             # @mkclosure0
 mkclosure1:                             # @mkclosure1
 	.cfi_startproc
 # %bb.0:
-	mov	edx, esi
-	mov	rax, rdi
-	ret
+	movl	%esi, %edx
+	movq	%rdi, %rax
+	retq
 .Lfunc_end3:
 	.size	mkclosure1, .Lfunc_end3-mkclosure1
 	.cfi_endproc
@@ -228,9 +227,9 @@ mkclosure1:                             # @mkclosure1
 main_return:                            # @main_return
 	.cfi_startproc
 # %bb.0:
-	mov	edi, offset .L.str
-	xor	eax, eax
-	mov	esi, edx
+	movl	$.L.str, %edi
+	xorl	%eax, %eax
+	movl	%edx, %esi
 	jmp	printf                  # TAILCALL
 .Lfunc_end4:
 	.size	main_return, .Lfunc_end4-main_return
@@ -242,8 +241,8 @@ main_return:                            # @main_return
 case_ackerman_aval_bdec:                # @case_ackerman_aval_bdec
 	.cfi_startproc
 # %bb.0:
-	mov	edi, esi
-	mov	esi, edx
+	movl	%esi, %edi
+	movl	%edx, %esi
 	jmp	ackerman                # TAILCALL
 .Lfunc_end5:
 	.size	case_ackerman_aval_bdec, .Lfunc_end5-case_ackerman_aval_bdec
@@ -255,51 +254,51 @@ case_ackerman_aval_bdec:                # @case_ackerman_aval_bdec
 ackerman:                               # @ackerman
 	.cfi_startproc
 # %bb.0:
-	push	rbp
+	pushq	%rbp
 	.cfi_def_cfa_offset 16
-	push	rbx
+	pushq	%rbx
 	.cfi_def_cfa_offset 24
-	push	rax
+	pushq	%rax
 	.cfi_def_cfa_offset 32
-	.cfi_offset rbx, -24
-	.cfi_offset rbp, -16
-	mov	ebx, esi
-	mov	ebp, edi
-	test	ebp, ebp
+	.cfi_offset %rbx, -24
+	.cfi_offset %rbp, -16
+	movl	%esi, %ebx
+	movl	%edi, %ebp
+	testl	%ebp, %ebp
 	jne	.LBB6_2
 	jmp	.LBB6_4
 	.p2align	4, 0x90
 .LBB6_3:                                #   in Loop: Header=BB6_2 Depth=1
-	mov	ebx, 1
-	test	ebp, ebp
+	movl	$1, %ebx
+	testl	%ebp, %ebp
 	je	.LBB6_4
 .LBB6_2:                                # =>This Loop Header: Depth=1
                                         #     Child Loop BB6_5 Depth 2
-	add	ebp, -1
-	test	ebx, ebx
+	addl	$-1, %ebp
+	testl	%ebx, %ebx
 	je	.LBB6_3
 	.p2align	4, 0x90
 .LBB6_5:                                #   Parent Loop BB6_2 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
-	mov	edi, offset case_ackerman_aval_bdec
-	mov	esi, ebp
-	call	mkclosure1
-	mov	rdi, rax
-	mov	rsi, rdx
-	call	pushReturn
-	add	ebx, -1
+	movl	$case_ackerman_aval_bdec, %edi
+	movl	%ebp, %esi
+	callq	mkclosure1
+	movq	%rax, %rdi
+	movq	%rdx, %rsi
+	callq	pushReturn
+	addl	$-1, %ebx
 	jne	.LBB6_5
 	jmp	.LBB6_3
 .LBB6_4:
-	call	popReturn
-	add	ebx, 1
-	mov	rdi, rax
-	mov	rsi, rdx
-	mov	edx, ebx
-	add	rsp, 8
-	pop	rbx
-	pop	rbp
-	jmp	rax                     # TAILCALL
+	callq	popReturn
+	addl	$1, %ebx
+	movq	%rax, %rdi
+	movq	%rdx, %rsi
+	movl	%ebx, %edx
+	addq	$8, %rsp
+	popq	%rbx
+	popq	%rbp
+	jmpq	*%rax                   # TAILCALL
 .Lfunc_end6:
 	.size	ackerman, .Lfunc_end6-ackerman
 	.cfi_endproc
@@ -310,19 +309,19 @@ ackerman:                               # @ackerman
 main:                                   # @main
 	.cfi_startproc
 # %bb.0:
-	push	rax
+	pushq	%rax
 	.cfi_def_cfa_offset 16
-	mov	edi, offset main_return
-	call	mkclosure0
-	movabs	rsi, 223338299444
-	mov	rdi, rax
-	call	pushReturn
-	mov	edi, 3
-	mov	esi, 11
-	call	ackerman
-	xor	eax, eax
-	pop	rcx
-	ret
+	movl	$main_return, %edi
+	callq	mkclosure0
+	movabsq	$223338299444, %rsi     # imm = 0x3400000034
+	movq	%rax, %rdi
+	callq	pushReturn
+	movl	$3, %edi
+	movl	$11, %esi
+	callq	ackerman
+	xorl	%eax, %eax
+	popq	%rcx
+	retq
 .Lfunc_end7:
 	.size	main, .Lfunc_end7-main
 	.cfi_endproc
@@ -346,4 +345,5 @@ g_ret_sp:
 
 	.ident	"clang version 6.0.0 (https://github.com/llvm-mirror/clang.git 40e9a74cba88c271af3407dad30006386881097b) (https://github.com/llvm-mirror/llvm.git 981877461a4a4387994841065d35f4897fe8dfeb)"
 	.section	".note.GNU-stack","",@progbits
+
 ```
