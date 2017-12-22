@@ -1,0 +1,15 @@
+*.s
+*.ll
+*.out
+build
+cmake-build-debug
+*.generated.*
+test/*dSYM*/
+*tags*
+*.dump*
+a.out
+*.hi
+*.ll
+tags
+*.o
+
