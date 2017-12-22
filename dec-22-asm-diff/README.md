@@ -58,25 +58,25 @@ int main() {
 
 ```
 ╭─bollu@cantordust ~/exploration/dec-22-asm-diff/haskell-like-c  ‹master*› 
-╰─$ sudo perf stat -d ./a.out
+╰─$ sudo perf  stat -d ./a.out                                                                                                                                   255 ↵
+[sudo] password for bollu: 
 16381
  Performance counter stats for './a.out':
 
-        593.519342      task-clock (msec)         #    0.999 CPUs utilized          
-                 1      context-switches          #    0.002 K/sec                  
+        368.344137      task-clock (msec)         #    0.998 CPUs utilized          
+                 0      context-switches          #    0.000 K/sec                  
                  0      cpu-migrations            #    0.000 K/sec                  
-               111      page-faults               #    0.187 K/sec                  
-    1,70,39,90,940      cycles                    #    2.871 GHz                      (50.26%)
-    3,92,42,71,140      instructions              #    2.30  insn per cycle           (62.95%)
-      96,23,45,792      branches                  # 1621.423 M/sec                    (63.20%)
-            52,883      branch-misses             #    0.01% of all branches          (63.45%)
-      81,69,54,402      L1-dcache-loads           # 1376.458 M/sec                    (61.75%)
-       3,16,28,281      L1-dcache-load-misses     #    3.87% of all L1-dcache hits    (24.70%)
-            32,498      LLC-loads                 #    0.055 M/sec                    (24.36%)
-               343      LLC-load-misses           #    1.06% of all LL-cache hits     (37.56%)
+               112      page-faults               #    0.304 K/sec                  
+    1,17,08,87,766      cycles                    #    3.179 GHz                      (50.43%)
+    2,01,29,81,158      instructions              #    1.72  insn per cycle           (63.24%)
+      35,10,07,332      branches                  #  952.933 M/sec                    (63.64%)
+            42,870      branch-misses             #    0.01% of all branches          (64.04%)
+      36,08,12,951      L1-dcache-loads           #  979.554 M/sec                    (61.20%)
+       3,22,51,684      L1-dcache-load-misses     #    8.94% of all L1-dcache hits    (24.31%)
+            63,103      LLC-loads                 #    0.171 M/sec                    (23.97%)
+               346      LLC-load-misses           #    0.55% of all LL-cache hits     (37.60%)
 
-       0.594038294 seconds time elapsed
-
+       0.369129171 seconds time elapsed
 ```
 # Asm
 
@@ -164,66 +164,6 @@ main:                                   # @main
 ```asm
 	.text
 	.file	"test.c"
-	.globl	pushReturn              # -- Begin function pushReturn
-	.p2align	4, 0x90
-	.type	pushReturn,@function
-pushReturn:                             # @pushReturn
-	.cfi_startproc
-# %bb.0:
-	movslq	g_ret_sp(%rip), %rax
-	leal	1(%rax), %ecx
-	movl	%ecx, g_ret_sp(%rip)
-	shlq	$4, %rax
-	movq	%rdi, g_ret_stack(%rax)
-	movq	%rsi, g_ret_stack+8(%rax)
-	retq
-.Lfunc_end0:
-	.size	pushReturn, .Lfunc_end0-pushReturn
-	.cfi_endproc
-                                        # -- End function
-	.globl	popReturn               # -- Begin function popReturn
-	.p2align	4, 0x90
-	.type	popReturn,@function
-popReturn:                              # @popReturn
-	.cfi_startproc
-# %bb.0:
-	movslq	g_ret_sp(%rip), %rcx
-	addq	$-1, %rcx
-	movl	%ecx, g_ret_sp(%rip)
-	shlq	$4, %rcx
-	movq	g_ret_stack(%rcx), %rax
-	movq	g_ret_stack+8(%rcx), %rdx
-	retq
-.Lfunc_end1:
-	.size	popReturn, .Lfunc_end1-popReturn
-	.cfi_endproc
-                                        # -- End function
-	.globl	mkclosure0              # -- Begin function mkclosure0
-	.p2align	4, 0x90
-	.type	mkclosure0,@function
-mkclosure0:                             # @mkclosure0
-	.cfi_startproc
-# %bb.0:
-	movabsq	$223338299444, %rdx     # imm = 0x3400000034
-	movq	%rdi, %rax
-	retq
-.Lfunc_end2:
-	.size	mkclosure0, .Lfunc_end2-mkclosure0
-	.cfi_endproc
-                                        # -- End function
-	.globl	mkclosure1              # -- Begin function mkclosure1
-	.p2align	4, 0x90
-	.type	mkclosure1,@function
-mkclosure1:                             # @mkclosure1
-	.cfi_startproc
-# %bb.0:
-	movl	%esi, %edx
-	movq	%rdi, %rax
-	retq
-.Lfunc_end3:
-	.size	mkclosure1, .Lfunc_end3-mkclosure1
-	.cfi_endproc
-                                        # -- End function
 	.globl	main_return             # -- Begin function main_return
 	.p2align	4, 0x90
 	.type	main_return,@function
@@ -234,8 +174,8 @@ main_return:                            # @main_return
 	xorl	%eax, %eax
 	movl	%edx, %esi
 	jmp	printf                  # TAILCALL
-.Lfunc_end4:
-	.size	main_return, .Lfunc_end4-main_return
+.Lfunc_end0:
+	.size	main_return, .Lfunc_end0-main_return
 	.cfi_endproc
                                         # -- End function
 	.globl	case_ackerman_aval_bdec # -- Begin function case_ackerman_aval_bdec
@@ -247,8 +187,8 @@ case_ackerman_aval_bdec:                # @case_ackerman_aval_bdec
 	movl	%esi, %edi
 	movl	%edx, %esi
 	jmp	ackerman                # TAILCALL
-.Lfunc_end5:
-	.size	case_ackerman_aval_bdec, .Lfunc_end5-case_ackerman_aval_bdec
+.Lfunc_end1:
+	.size	case_ackerman_aval_bdec, .Lfunc_end1-case_ackerman_aval_bdec
 	.cfi_endproc
                                         # -- End function
 	.globl	ackerman                # -- Begin function ackerman
@@ -257,53 +197,45 @@ case_ackerman_aval_bdec:                # @case_ackerman_aval_bdec
 ackerman:                               # @ackerman
 	.cfi_startproc
 # %bb.0:
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	pushq	%rbx
-	.cfi_def_cfa_offset 24
-	pushq	%rax
-	.cfi_def_cfa_offset 32
-	.cfi_offset %rbx, -24
-	.cfi_offset %rbp, -16
-	movl	%esi, %ebx
-	movl	%edi, %ebp
-	testl	%ebp, %ebp
-	jne	.LBB6_2
-	jmp	.LBB6_4
+	movl	%esi, %eax
+	testl	%edi, %edi
+	je	.LBB2_4
+# %bb.1:
+	movl	%edi, %ecx
 	.p2align	4, 0x90
-.LBB6_3:                                #   in Loop: Header=BB6_2 Depth=1
-	movl	$1, %ebx
-	testl	%ebp, %ebp
-	je	.LBB6_4
-.LBB6_2:                                # =>This Loop Header: Depth=1
-                                        #     Child Loop BB6_5 Depth 2
-	addl	$-1, %ebp
-	testl	%ebx, %ebx
-	je	.LBB6_3
+.LBB2_2:                                # =>This Loop Header: Depth=1
+                                        #     Child Loop BB2_5 Depth 2
+	leal	-1(%rcx), %edx
+	testl	%eax, %eax
+	je	.LBB2_3
 	.p2align	4, 0x90
-.LBB6_5:                                #   Parent Loop BB6_2 Depth=1
+.LBB2_5:                                #   Parent Loop BB2_2 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
-	movl	$case_ackerman_aval_bdec, %edi
-	movl	%ebp, %esi
-	callq	mkclosure1
-	movq	%rax, %rdi
-	movq	%rdx, %rsi
-	callq	pushReturn
-	addl	$-1, %ebx
-	jne	.LBB6_5
-	jmp	.LBB6_3
-.LBB6_4:
-	callq	popReturn
-	addl	$1, %ebx
-	movq	%rax, %rdi
-	movq	%rdx, %rsi
-	movl	%ebx, %edx
-	addq	$8, %rsp
-	popq	%rbx
-	popq	%rbp
-	jmpq	*%rax                   # TAILCALL
-.Lfunc_end6:
-	.size	ackerman, .Lfunc_end6-ackerman
+	movslq	g_ret_sp(%rip), %rsi
+	leal	1(%rsi), %edi
+	movl	%edi, g_ret_sp(%rip)
+	shlq	$4, %rsi
+	movq	$case_ackerman_aval_bdec, g_ret_stack(%rsi)
+	movq	%rdx, g_ret_stack+8(%rsi)
+	addl	$-1, %eax
+	jne	.LBB2_5
+.LBB2_3:                                #   in Loop: Header=BB2_2 Depth=1
+	addq	$-1, %rcx
+	movl	$1, %eax
+	testl	%edx, %edx
+	jne	.LBB2_2
+.LBB2_4:
+	movslq	g_ret_sp(%rip), %rcx
+	addq	$-1, %rcx
+	movl	%ecx, g_ret_sp(%rip)
+	shlq	$4, %rcx
+	movq	g_ret_stack(%rcx), %rdi
+	movq	g_ret_stack+8(%rcx), %rsi
+	addl	$1, %eax
+	movl	%eax, %edx
+	jmpq	*%rdi                   # TAILCALL
+.Lfunc_end2:
+	.size	ackerman, .Lfunc_end2-ackerman
 	.cfi_endproc
                                         # -- End function
 	.globl	main                    # -- Begin function main
@@ -314,19 +246,21 @@ main:                                   # @main
 # %bb.0:
 	pushq	%rax
 	.cfi_def_cfa_offset 16
-	movl	$main_return, %edi
-	callq	mkclosure0
-	movabsq	$223338299444, %rsi     # imm = 0x3400000034
-	movq	%rax, %rdi
-	callq	pushReturn
+	movslq	g_ret_sp(%rip), %rax
+	leal	1(%rax), %ecx
+	movl	%ecx, g_ret_sp(%rip)
+	shlq	$4, %rax
+	movq	$main_return, g_ret_stack(%rax)
+	movabsq	$223338299444, %rcx     # imm = 0x3400000034
+	movq	%rcx, g_ret_stack+8(%rax)
 	movl	$3, %edi
 	movl	$11, %esi
 	callq	ackerman
 	xorl	%eax, %eax
 	popq	%rcx
 	retq
-.Lfunc_end7:
-	.size	main, .Lfunc_end7-main
+.Lfunc_end3:
+	.size	main, .Lfunc_end3-main
 	.cfi_endproc
                                         # -- End function
 	.type	g_ret_sp,@object        # @g_ret_sp
@@ -337,17 +271,15 @@ g_ret_sp:
 	.long	0                       # 0x0
 	.size	g_ret_sp, 4
 
-	.type	g_ret_stack,@object     # @g_ret_stack
-	.comm	g_ret_stack,16000000,16
 	.type	.L.str,@object          # @.str
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .L.str:
 	.asciz	"%d"
 	.size	.L.str, 3
 
+	.type	g_ret_stack,@object     # @g_ret_stack
+	.comm	g_ret_stack,16000000,16
 
 	.ident	"clang version 6.0.0 (https://github.com/llvm-mirror/clang.git 40e9a74cba88c271af3407dad30006386881097b) (https://github.com/llvm-mirror/llvm.git 981877461a4a4387994841065d35f4897fe8dfeb)"
 	.section	".note.GNU-stack","",@progbits
-
 ```
-
