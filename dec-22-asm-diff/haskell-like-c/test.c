@@ -33,7 +33,7 @@ binding main = \() -> Boxed {
 
 typedef struct Closure {
 	void *fn;
-	int data1, data2;
+	int data1;
 } Closure;
 
 
@@ -62,7 +62,6 @@ __attribute__((always_inline))
 inline Closure mkclosure0(void *f) {
 	Closure c;
 	c.fn = (void *)f;
-	c.data1 = c.data2 = 52;
 	return c;
 }
 
@@ -72,7 +71,6 @@ inline Closure mkclosure1(void *f, int i) {
 	Closure c;
 	c.fn = f;
 	c.data1 = i;
-	c.data2 = 0;
 	return c;
 }
 
